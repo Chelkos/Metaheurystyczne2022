@@ -1,0 +1,1 @@
+# Metaheurystyczne2022
