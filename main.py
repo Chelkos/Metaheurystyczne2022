@@ -3,10 +3,14 @@ import random
 import math
 import tsplib95 as tsp
 import networkx as nx
+import algorithms as alg
 
 def load(file):
     problem = tsp.load(file)
     return problem.get_graph()
+
+def objective(G):
+    return G.size(weight='weight')
 
 def generate(n):
     G = nx.complete_graph(n)
@@ -26,7 +30,8 @@ def generate(n):
                 G[i+1][j+1]['weight'] = int(math.sqrt(xd**2 + yd**2) + 0.5)
 
     return G
-
+      
 if __name__=='__main__':
-    exit
-    #todo
+    G = generate(500)
+    solution = alg.closest_neighbour(G)
+    print(objective(solution))
