@@ -7,7 +7,10 @@ import algorithms as alg
 
 def load(file):
     problem = tsp.load(file)
-    return problem.get_graph()
+    G = problem.get_graph()
+    for n in G.nodes():
+        G.has_edge(n,n) and G.remove_edge(n, n)
+    return G
 
 def objective(G):
     return G.size(weight='weight')
