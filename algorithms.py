@@ -1,24 +1,37 @@
 import networkx as nx
+import math
 import random
 
-def nearest_neighbour(G):
-    node = random.choice(list(G.nodes()))
+def objective(G):
+    return G.size(weight='weight')
+
+def nearest_neighbour(G, node=False):
     solution = nx.empty_graph()
-    solution.add_node(node)
+    node = node or random.choice(list(G.nodes()))
 
     while len(G.nodes()) - 1:
-        min = float('inf')
-        nextNode = 0
+        min = math.inf
 
         for u,v in G.edges(node):
             if G[u][v]['weight'] < min:
                 min = G[u][v]['weight']
-                nextNode = v
+                next_node = v
 
-        solution.add_node(nextNode)
-        solution.add_edge(node, nextNode, weight=min)
+        solution.add_edge(node, next_node, weight=min)
         G.remove_node(node)
-        node = nextNode
+        node = next_node
     
     return solution
     
+def repetitive_nearest_neighbour(G):
+    min = math.inf
+
+    for node in G.nodes():
+        H = G.copy()
+        route = nearest_neighbour(H, node)
+        weight = objective(route)
+        if weight < min:
+            solution = route
+            min = weight
+
+    return solution

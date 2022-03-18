@@ -12,9 +12,6 @@ def load(file):
         G.has_edge(n,n) and G.remove_edge(n, n)
     return G
 
-def objective(G):
-    return G.size(weight='weight')
-
 def generate(n):
     G = nx.complete_graph(n)
     G = nx.relabel_nodes(G, {i: i+1 for i in range(n)})
@@ -26,15 +23,23 @@ def generate(n):
         coords['y'].append(random.randint(1, 4000))
 
     for i in range(n):
-        for j in range(i, n):
-            if i != j:
-                xd = coords['x'][i] - coords['x'][j]
-                yd = coords['y'][i] - coords['y'][j]
-                G[i+1][j+1]['weight'] = int(math.sqrt(xd**2 + yd**2) + 0.5)
+        for j in range(i+1, n):
+            xd = coords['x'][i] - coords['x'][j]
+            yd = coords['y'][i] - coords['y'][j]
+            G[i+1][j+1]['weight'] = int(math.sqrt(xd**2 + yd**2) + 0.5)
 
     return G
       
+def test_all(G):
+    algorithms = [
+        alg.nearest_neighbour, 
+        alg.repetitive_nearest_neighbour
+    ]
+
+    for algorithm in algorithms:
+        H = G.copy()
+        print(alg.objective(algorithm(H)))
+
 if __name__=='__main__':
-    G = generate(500)
-    solution = alg.closest_neighbour(G)
-    print(objective(solution))
+    G = generate(100)
+    test_all(G)
