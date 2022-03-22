@@ -21,6 +21,6 @@ def test_all(G):
         print(alg.objective(algorithm(H)))
 
 if __name__=='__main__':
-    G = gen.generate_asymmetric(5, 4000)
-    alg.opt_2(G)
+    G = gen.generate_symmetric(20, 4000)
+    print(alg.opt_2(G))
     #test_all(G)
