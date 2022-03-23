@@ -61,69 +61,27 @@ def k_random(k,G):
 
 def invert(G, route, i, j):
     nodes = list(route.nodes())
-    inversed = route.copy()
+    inverted = nodes[:i] + nodes[i:j+1][::-1] + nodes[j+1:]
 
-    if i != 0:
-        inversed.remove_edge(nodes[i-1], nodes[i])
-        inversed.add_edge(nodes[i-1], nodes[j], weight=G[nodes[i-1]][nodes[j]]['weight'])
+    new_route = nx.DiGraph()
 
-    if j != len(nodes)-1:
-        inversed.remove_edge(nodes[j], nodes[j+1])
-        inversed.add_edge(nodes[i], nodes[j+1], weight=G[nodes[i]][nodes[j+1]]['weight'])
+    for n in range(len(inverted) - 1):
+        new_route.add_edge(inverted[n], inverted[n+1], weight=G[inverted[n]][inverted[n+1]]['weight'])
 
-    for n in range(i, j):
-        inversed.remove_edge(nodes[n], nodes[n+1])
-        inversed.add_edge(nodes[n+1], nodes[n], weight=G[nodes[n+1]][nodes[n]]['weight'])
+    return new_route
 
-    return inversed
-
-def inverse(original,G,i,j):
-    helper = G.copy()
-    c_graph = G.copy()
-    c_size = len(c_graph.nodes())
-    node_j = list(helper.nodes())[j]
-    node_i = list(helper.nodes())[i]
-    if i == 0:
-        node_ip = None
-    else:
-        node_ip = list(helper.nodes())[i-1]
-    if j==c_size-1:
-        node_jn = None
-    else:
-        node_jn = list(helper.nodes())[j+1]
-    if node_ip is not None:
-        c_graph.remove_edge(node_ip,node_i)
-    if node_jn is not None:    
-        c_graph.remove_edge(node_jn,node_j)
-    for k in range(i,j):
-        if k>c_size:
-            k=0
-        new_weight = original[list(helper.nodes())[k+1]][list(helper.nodes())[k]]['weight']
-        c_graph.remove_edge(list(helper.nodes())[k],list(helper.nodes())[k+1])
-        c_graph.add_edge(list(helper.nodes())[k+1],list(helper.nodes())[k],weight=new_weight)
-    if node_ip is not None:
-        new_weight_p = original[node_ip][node_j]['weight']
-        c_graph.add_edge(node_ip,node_j,weight=new_weight_p)
-    if node_jn is not None:
-        new_weight_k = original[node_i][node_jn]['weight']
-        c_graph.add_edge(node_i,node_jn,weight=new_weight_k)
-    return c_graph
-
-
-def opt_2(G):
-    help_graph = G.copy()
-    graph_size = len(list(help_graph.nodes()))
-    first_solution = nearest_neighbour(help_graph)
-    optimal_solution = first_solution
-    current_lowest = utils.objective(first_solution)
-    print(current_lowest)
-    for i in range(0,graph_size):
-        for k in range(i+1,graph_size):
+def _2_opt(G):
+    n = len(list(G.nodes()))
+    solution = repetitive_nearest_neighbour(G)
+    min_weight = utils.objective(solution)
+    
+    for i in range(n):
+        for j in range(i+1, n):
+            route = invert(G, solution, i, j)
+            weight = utils.objective(route)
             
-            current_solution = inverse(G,first_solution,i,k)
-            print(utils.objective(current_solution)," ",current_lowest)
-            if utils.objective(current_solution)< current_lowest:
-                current_lowest = utils.objective(current_solution)
-                optimal_solution = current_solution
+            if weight < min_weight:
+                solution = route
+                min_weight = weight
 
-    return optimal_solution
+    return solution

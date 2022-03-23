@@ -15,17 +15,14 @@ def load(file):
 def test_all(G):
     algorithms = [
         alg.nearest_neighbour, 
-        alg.repetitive_nearest_neighbour
+        alg.repetitive_nearest_neighbour,
+        alg._2_opt
     ]
 
     for algorithm in algorithms:
         H = G.copy()
-        print(alg.objective(algorithm(H)))
+        print(utils.objective(algorithm(H)))
 
 if __name__=='__main__':
-    random.seed(10)
-    G = gen.generate_symmetric(5, 1000)
-    route = alg.repetitive_nearest_neighbour(G)
-    utils.draw(route)
-    route = alg.invert(G, route, 1, 3)
-    utils.draw(route)
+    G = gen.generate_asymmetric(100, 1000)
+    test_all(G)
