@@ -1,16 +1,11 @@
-from logging import exception
 import networkx as nx
-import scipy as sp
 import math
 import random 
-
-
-def objective(G):
-    return G.size(weight='weight')
+import utils
 
 def nearest_neighbour(Graphy, node=False):
     G = Graphy.copy()
-    solution = nx.Graph()
+    solution = nx.DiGraph()
     node = node or random.choice(list(G.nodes()))
 
     while len(G.nodes()) - 1:
@@ -22,7 +17,6 @@ def nearest_neighbour(Graphy, node=False):
                 next_node = v
 
         solution.add_edge(node, next_node, weight=min)
-        #solution.add_edge(next_node, node , weight=min)
         G.remove_node(node)
         node = next_node
     
@@ -32,21 +26,20 @@ def repetitive_nearest_neighbour(G):
     min = math.inf
 
     for node in G.nodes():
-        H = G.copy()
-        route = nearest_neighbour(H, node)
-        weight = objective(route)
+        route = nearest_neighbour(G, node)
+        weight = utils.objective(route)
         if weight < min:
             solution = route
             min = weight
 
     return solution
 
-
 def k_random(k,G):
-    solution = nx.empty_graph()
+    solution = nx.DiGraph()
     solution_weight = None
+
     for i in range(k):
-        possible_solution = nx.empty_graph()
+        possible_solution = nx.DiGraph()
         graph = G.copy()
         random_node = random.choice(list(graph.nodes()))
         
@@ -60,12 +53,29 @@ def k_random(k,G):
             graph.remove_node(u)
             random_node = v
             
-        if solution_weight is None or objective(possible_solution)<solution_weight:
-            
-            solution =possible_solution
-            solution_weight = objective(possible_solution)
+        if solution_weight is None or utils.objective(possible_solution) < solution_weight:
+            solution = possible_solution
+            solution_weight = utils.objective(possible_solution)
+
     return solution
 
+def invert(G, route, i, j):
+    nodes = list(route.nodes())
+    inversed = route.copy()
+
+    if i != 0:
+        inversed.remove_edge(nodes[i-1], nodes[i])
+        inversed.add_edge(nodes[i-1], nodes[j], weight=G[nodes[i-1]][nodes[j]]['weight'])
+
+    if j != len(nodes)-1:
+        inversed.remove_edge(nodes[j], nodes[j+1])
+        inversed.add_edge(nodes[i], nodes[j+1], weight=G[nodes[i]][nodes[j+1]]['weight'])
+
+    for n in range(i, j):
+        inversed.remove_edge(nodes[n], nodes[n+1])
+        inversed.add_edge(nodes[n+1], nodes[n], weight=G[nodes[n+1]][nodes[n]]['weight'])
+
+    return inversed
 
 def inverse(original,G,i,j):
     helper = G.copy()
@@ -105,15 +115,15 @@ def opt_2(G):
     graph_size = len(list(help_graph.nodes()))
     first_solution = nearest_neighbour(help_graph)
     optimal_solution = first_solution
-    current_lowest = objective(first_solution)
+    current_lowest = utils.objective(first_solution)
     print(current_lowest)
     for i in range(0,graph_size):
         for k in range(i+1,graph_size):
             
             current_solution = inverse(G,first_solution,i,k)
-            print(objective(current_solution)," ",current_lowest)
-            if objective(current_solution)< current_lowest:
-                current_lowest = objective(current_solution)
+            print(utils.objective(current_solution)," ",current_lowest)
+            if utils.objective(current_solution)< current_lowest:
+                current_lowest = utils.objective(current_solution)
                 optimal_solution = current_solution
 
     return optimal_solution

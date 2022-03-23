@@ -1,7 +1,9 @@
 import sys
+import random
 import tsplib95 as tsp
 import algorithms as alg
 import generators as gen
+import utils
 
 def load(file):
     problem = tsp.load(file)
@@ -21,6 +23,9 @@ def test_all(G):
         print(alg.objective(algorithm(H)))
 
 if __name__=='__main__':
-    G = gen.generate_symmetric(20, 4000)
-    print(alg.opt_2(G))
-    #test_all(G)
+    random.seed(10)
+    G = gen.generate_symmetric(5, 1000)
+    route = alg.repetitive_nearest_neighbour(G)
+    utils.draw(route)
+    route = alg.invert(G, route, 1, 3)
+    utils.draw(route)
