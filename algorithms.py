@@ -75,13 +75,23 @@ def _2_opt(G):
     solution = repetitive_nearest_neighbour(G)
     min_weight = utils.objective(solution)
     
-    for i in range(n):
-        for j in range(i+1, n):
-            route = invert(G, solution, i, j)
-            weight = utils.objective(route)
+    progress = True
+
+    while progress == True:
+        progress = False
+
+        for i in range(n):
+            if progress == True:
+                break
+
+            for j in range(i+1, n):
+                route = invert(G, solution, i, j)
+                weight = utils.objective(route)
             
-            if weight < min_weight:
-                solution = route
-                min_weight = weight
+                if weight < min_weight:
+                    solution = route
+                    min_weight = weight
+                    progress = True
+                    break
 
     return solution

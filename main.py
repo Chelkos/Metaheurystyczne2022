@@ -20,8 +20,7 @@ def test_all(G):
     ]
 
     for algorithm in algorithms:
-        H = G.copy()
-        print(utils.objective(algorithm(H)))
+        print(utils.objective(algorithm(G)))
 
 if __name__=='__main__':
     G = gen.generate_asymmetric(100, 1000)
