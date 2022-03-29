@@ -34,7 +34,7 @@ def repetitive_nearest_neighbour(G):
 
     return solution
 
-def k_random(k,G):
+def k_random(G,k = 30):
     solution = nx.DiGraph()
     solution_weight = None
 
@@ -58,6 +58,9 @@ def k_random(k,G):
             solution_weight = utils.objective(possible_solution)
 
     return solution
+
+
+
 
 def invert(G, route, i, j):
     nodes = list(route.nodes())
