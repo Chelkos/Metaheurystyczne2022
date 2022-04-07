@@ -7,6 +7,7 @@ def nearest_neighbour(Graphy, node=False):
     G = Graphy.copy()
     solution = nx.DiGraph()
     node = node or random.choice(list(G.nodes()))
+    first_node = node
 
     while len(G.nodes()) - 1:
         min = math.inf
@@ -20,6 +21,7 @@ def nearest_neighbour(Graphy, node=False):
         G.remove_node(node)
         node = next_node
     
+    solution.add_edge(node, first_node, weight=Graphy[node][first_node]['weight'])
     return solution
     
 def repetitive_nearest_neighbour(G):
@@ -42,7 +44,7 @@ def k_random(G,k = 30):
         possible_solution = nx.DiGraph()
         graph = G.copy()
         random_node = random.choice(list(graph.nodes()))
-        
+        first_node = random_node
         for n in range(len(graph.nodes())-1):
             possible_solution.add_node(random_node)
             random_edge = random.choice(list(graph.edges(random_node)))
@@ -52,7 +54,7 @@ def k_random(G,k = 30):
             possible_solution.add_edge(u,v,weight = edge_weight)
             graph.remove_node(u)
             random_node = v
-            
+        possible_solution.add_edge(random_node, first_node, weight=G[random_node][first_node]['weight'])
         if solution_weight is None or utils.objective(possible_solution) < solution_weight:
             solution = possible_solution
             solution_weight = utils.objective(possible_solution)
@@ -70,6 +72,8 @@ def invert(G, route, i, j):
 
     for n in range(len(inverted) - 1):
         new_route.add_edge(inverted[n], inverted[n+1], weight=G[inverted[n]][inverted[n+1]]['weight'])
+    
+    new_route.add_edge(inverted[0], inverted[len(G.nodes())-1], weight=G[inverted[0]][inverted[len(G.nodes())-1]]['weight'])
 
     return new_route
 
