@@ -36,4 +36,4 @@ def test_all(G):
 
 if __name__=='__main__':
     G = gen.generate_symmetric(10, 1000)
-    test_all(G)
+    alg.generate_neighbourhood(G)

@@ -2,7 +2,8 @@ import networkx as nx
 import math
 import random 
 import utils
-
+tabu = []
+bestest_solution = nx.Graph()
 def nearest_neighbour(Graphy, node=False):
     G = Graphy.copy()
     solution = nx.DiGraph()
@@ -100,5 +101,24 @@ def _2_opt(G):
                     min_weight = weight
                     progress = True
                     break
-
     return solution
+
+
+
+def generate_neighbourhood(G):
+    n = len(list(G.nodes()))
+    algs = [invert]
+    neighbours = []
+    first_solution = nearest_neighbour(G)
+    for i in range(n):
+        for j in range(i+1,n):
+            curr_rep = invert(G,first_solution,i,j)
+            curr_weight = utils.objective(curr_rep)
+            neighbours.append((curr_rep,curr_weight))
+    neighbours.sort(key=lambda i:i[1],reverse=False)
+    for pair in neighbours:
+        if pair[1] not in tabu:
+            tabu.append(pair[1])
+            if pair[2] < utils.objective(bestest_solution):
+                bestest_solution = pair[1]
+    print(neighbours)
