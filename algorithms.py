@@ -2,9 +2,9 @@ import networkx as nx
 import math
 import random 
 import utils
-tabu = []
-bestest_solution = nx.Graph()
+
 def nearest_neighbour(Graphy, node=False):
+    random.seed(30)
     G = Graphy.copy()
     solution = nx.DiGraph()
     node = node or random.choice(list(G.nodes()))
@@ -62,9 +62,6 @@ def k_random(G,k = 30):
 
     return solution
 
-
-
-
 def invert(G, route, i, j):
     nodes = list(route.nodes())
     inverted = nodes[:i] + nodes[i:j+1][::-1] + nodes[j+1:]
@@ -103,22 +100,35 @@ def _2_opt(G):
                     break
     return solution
 
+def tabu_search(G, reps=100, size=15):
+    tabu = []
+    current_solution = nearest_neighbour(G)
+    best_solution = current_solution
+    n = len(G.nodes())
+    it = 0
 
+    while it < reps:
+        best_neighbour = None
+        for i in range(n):
+            for j in range(i+1, n):
+                if (i,j) not in tabu:
+                    neighbour = invert(G, current_solution, i, j)
+                    weight = utils.objective(neighbour)
+                    if best_neighbour == None or weight < best_weight:
+                        best_neighbour = neighbour
+                        best_weight = weight
+                        x,y = (i,j)
 
-def generate_neighbourhood(G):
-    n = len(list(G.nodes()))
-    algs = [invert]
-    neighbours = []
-    first_solution = nearest_neighbour(G)
-    for i in range(n):
-        for j in range(i+1,n):
-            curr_rep = invert(G,first_solution,i,j)
-            curr_weight = utils.objective(curr_rep)
-            neighbours.append((curr_rep,curr_weight))
-    neighbours.sort(key=lambda i:i[1],reverse=False)
-    for pair in neighbours:
-        if pair[1] not in tabu:
-            tabu.append(pair[1])
-            if pair[2] < utils.objective(bestest_solution):
-                bestest_solution = pair[1]
-    print(neighbours)
+        tabu.append((x,y))
+        current_solution = best_neighbour
+
+        if len(tabu) > size:
+            tabu.pop(0)
+
+        if best_weight < utils.objective(best_solution):
+            best_solution = current_solution
+            it = 0
+       
+        it += 1
+
+    return best_solution

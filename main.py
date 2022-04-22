@@ -1,7 +1,9 @@
 import tsplib95 as tsp
 import algorithms as alg
 import generators as gen
+import random
 import utils
+import networkx as nx
 
 def load(file):
     problem = tsp.load(file)
@@ -28,12 +30,15 @@ def test_all(G):
         alg.k_random,
         alg.nearest_neighbour, 
         alg.repetitive_nearest_neighbour,
-        alg._2_opt
+        alg._2_opt,
+        alg.tabu_search
     ]
 
     for algorithm in algorithms:
         print(utils.objective(algorithm(G)))
 
 if __name__=='__main__':
-    G = gen.generate_symmetric(10, 1000)
-    alg.generate_neighbourhood(G)
+    random.seed(100)
+    G = gen.generate_symmetric(30, 1000)
+    test_all(G)
+
