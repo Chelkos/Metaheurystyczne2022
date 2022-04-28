@@ -1,10 +1,11 @@
+from tracemalloc import start
 import tsplib95 as tsp
 import algorithms as alg
 import generators as gen
 import random
 import utils
 import networkx as nx
-
+import time
 def load(file):
     problem = tsp.load(file)
     G = problem.get_graph()
@@ -25,6 +26,25 @@ def open_file_no_size(title,sym_type,alg_name):
 def write_to_file(file,x,y):
     file.write("("+str(x)+", "+str(y)+")\n")
 
+def test_alg_type():
+    algs = [
+        alg.invert
+        alg.swap
+        alg.insert
+    ]
+    
+    
+    for a in algs:
+        if a == alg.invert:
+            n = "invert"
+        f_w = open(str('tabu_'+n+'.txt'),"a")
+        for size in [10,20,50]:
+            curr_graph = gen.generate_symmetric(size,1000)
+            sol = alg.tabu_search(curr_graph,50)
+            write_to_file(f_w,size,utils.objective(sol))
+
+
+
 def test_all(G):
     algorithms = [
         alg.k_random,
@@ -38,7 +58,7 @@ def test_all(G):
         print(utils.objective(algorithm(G)))
 
 if __name__=='__main__':
-    random.seed(100)
-    G = gen.generate_symmetric(30, 1000)
-    test_all(G)
-
+    random.seed(150)
+    #G = gen.generate_asymmetric(30, 1000)
+    #test_all(G)
+    test_alg_type()
