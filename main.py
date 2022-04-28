@@ -28,9 +28,9 @@ def write_to_file(file,x,y):
 
 def test_alg_type():
     algs = [
-        alg.invert
-        alg.swap
-        alg.insert
+        alg.invert,
+        alg.swap,
+        alg.insert,
     ]
     
     
