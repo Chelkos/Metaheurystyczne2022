@@ -75,6 +75,30 @@ def invert(G, route, i, j):
 
     return new_route
 
+def swap(G, route, i, j):
+    nodes = list(route.nodes())
+    nodes[i], nodes[j] = nodes[j], nodes[i]
+
+    new_route = nx.DiGraph()
+
+    for n in range(len(nodes) - 1):
+        new_route.add_edge(nodes[n], nodes[n+1], weight=G[nodes[n]][nodes[n+1]]['weight'])
+
+    new_route.add_edge(nodes[0], nodes[len(G.nodes())-1], weight=G[nodes[0]][nodes[len(G.nodes())-1]]['weight'])
+
+def insert(G, route, i, j):
+    nodes = list(route.nodes())
+    node = nodes.pop(i)
+    nodes.insert(j, node)
+    
+    new_route = nx.DiGraph()
+
+    for n in range(len(nodes) - 1):
+        new_route.add_edge(nodes[n], nodes[n+1], weight=G[nodes[n]][nodes[n+1]]['weight'])
+
+    new_route.add_edge(nodes[0], nodes[len(G.nodes())-1], weight=G[nodes[0]][nodes[len(G.nodes())-1]]['weight'])
+
+
 def _2_opt(G):
     n = len(list(G.nodes()))
     solution = repetitive_nearest_neighbour(G)
@@ -102,7 +126,7 @@ def _2_opt(G):
 
 def tabu_search(G, reps=100, size=15):
     tabu = []
-    current_solution = nearest_neighbour(G)
+    current_solution = repetitive_nearest_neighbour(G)
     best_solution = current_solution
     n = len(G.nodes())
     it = 0
