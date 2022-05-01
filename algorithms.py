@@ -85,7 +85,7 @@ def swap(G, route, i, j):
         new_route.add_edge(nodes[n], nodes[n+1], weight=G[nodes[n]][nodes[n+1]]['weight'])
 
     new_route.add_edge(nodes[0], nodes[len(G.nodes())-1], weight=G[nodes[0]][nodes[len(G.nodes())-1]]['weight'])
-
+    return new_route
 def insert(G, route, i, j):
     nodes = list(route.nodes())
     node = nodes.pop(i)
@@ -97,7 +97,7 @@ def insert(G, route, i, j):
         new_route.add_edge(nodes[n], nodes[n+1], weight=G[nodes[n]][nodes[n+1]]['weight'])
 
     new_route.add_edge(nodes[0], nodes[len(G.nodes())-1], weight=G[nodes[0]][nodes[len(G.nodes())-1]]['weight'])
-
+    return new_route
 
 def _2_opt(G):
     n = len(list(G.nodes()))
@@ -124,9 +124,9 @@ def _2_opt(G):
                     break
     return solution
 
-def tabu_search(G, reps=100, size=15):
+def tabu_search(G, reps=100, size=15,type_a=invert,start_type=repetitive_nearest_neighbour):
     tabu = []
-    current_solution = repetitive_nearest_neighbour(G)
+    current_solution = start_type(G)
     best_solution = current_solution
     n = len(G.nodes())
     it = 0
@@ -136,7 +136,7 @@ def tabu_search(G, reps=100, size=15):
         for i in range(n):
             for j in range(i+1, n):
                 if (i,j) not in tabu:
-                    neighbour = invert(G, current_solution, i, j)
+                    neighbour = type_a(G, current_solution, i, j)
                     weight = utils.objective(neighbour)
                     if best_neighbour == None or weight < best_weight:
                         best_neighbour = neighbour
