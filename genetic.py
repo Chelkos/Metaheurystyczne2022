@@ -3,21 +3,25 @@ import networkx as nx
 import random
 import utils
 
-def genetic(G, pop_size, reps=1000):
-    population = generate_population(G, algs.k_random, pop_size)
+def genetic(G, pop_size, reps=250):
+    population = generate_population(G, algs.nearest_neighbour, pop_size)
     best_weight = float('inf')
     best_sol = None
     i = 0
-
+    curr_small = float('inf')
     while i < reps:
-        print(i)
+        #print(i)
         for member in population:
             if member[1] < best_weight:
                 best_weight = member[1]
                 best_sol = member[0]
                 i = 0
-        parents = selection(G, population,pop_size)
+            
+        parents,elite = selection(G, population,pop_size)
         population = breed(G, parents)
+        population+=elite
+        population = sorted(population,key = lambda x:x[1])
+        population = population[:pop_size]
         i+=1
 
     return best_sol
@@ -43,7 +47,10 @@ def mutate(G,route,operation = algs.invert):
 
 def selection(G, population, pop_size, elite_size=2):
     parents = []
+    
     prob = []
+    sortu = sorted(population,key = lambda x:x[1])
+    the_best_parents = []
     maxi = population[0][1]
     sum = 0
 
@@ -57,11 +64,12 @@ def selection(G, population, pop_size, elite_size=2):
 
     while len(parents)<pop_size:
         for i in range(len(population)):
-            if random.randrange(0,1)<prob[i] and population[i] not in parents:
+            
+            if random.uniform(0,1)>prob[i] and population[i] not in parents:
                 parents.append(population[i])
                 if len(parents)>=pop_size:
                     break
-    return parents
+    return parents,sortu[0:elite_size]
 
 def single_breed(G,parent1,parent2,start,end):
     child = nx.DiGraph()

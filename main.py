@@ -157,8 +157,8 @@ if __name__=='__main__':
     #test_tabu_graph()
     #test_tabu_size()
     print(utils.objective(alg.repetitive_nearest_neighbour(G)))
-    #sol = alg.tabu_search(G, 100, 15, alg.invert, alg.nearest_neighbour)
-    #print(utils.objective(sol))
+    sol = alg.tabu_search(G, 100, 15, alg.invert, alg.nearest_neighbour)
+    print(utils.objective(sol))
  
-    sol = gene.genetic(G,100)
+    sol = gene.genetic(G,120)
     print(utils.objective(sol))
