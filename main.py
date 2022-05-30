@@ -143,6 +143,10 @@ def test_all(G):
     for algorithm in algorithms:
         print(utils.objective(algorithm(G)))
 
+
+def test_genetic(G):
+    return
+
 if __name__=='__main__':
     random.seed(170)
     G = gen.generate_symmetric(30,1000)
