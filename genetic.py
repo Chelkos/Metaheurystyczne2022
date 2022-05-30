@@ -10,11 +10,11 @@ def genetic(G, pop_size, reps=1000):
     i = 0
 
     while i < reps:
-        print(i)
         for member in population:
             if member[1] < best_weight:
                 best_weight = member[1]
                 best_sol = member[0]
+                print(best_weight)
                 i = 0
         parents = selection(G, population,pop_size)
         population = breed(G, parents)
@@ -32,8 +32,8 @@ def generate_population(G, alg=algs.k_random, pop_size=10):
         population.append((sol,weight))
 
     return population
-    
-def mutate(G,route,operation = algs.invert):
+
+def mutate(G,route,operation = algs.swap):
     geneA = random.randint(0, len(G.nodes())-1)
     geneB = random.randint(0, len(G.nodes())-1)
     start = min(geneA, geneB)
@@ -41,7 +41,26 @@ def mutate(G,route,operation = algs.invert):
     return operation(G,route,start,end)
 
 
-def selection(G, population, pop_size, elite_size=2):
+def selection(G, population, pop_size): #tournament
+    parents = []
+
+    while len(parents)<pop_size:
+        potential_parents = []
+
+        for i in range(20):
+            p = random.choice(population)
+            potential_parents.append(p)
+
+        best = potential_parents[0]
+        for element in potential_parents:
+            if element[1] < best[1]:
+                best = element
+
+        parents.append(best)
+
+    return parents
+        
+def selection2(G, population, pop_size, elite_size=2): #roulette
     parents = []
     prob = []
     maxi = population[0][1]
@@ -57,7 +76,7 @@ def selection(G, population, pop_size, elite_size=2):
 
     while len(parents)<pop_size:
         for i in range(len(population)):
-            if random.randrange(0,1)<prob[i] and population[i] not in parents:
+            if random.uniform(0,1)<prob[i] and population[i] not in parents:
                 parents.append(population[i])
                 if len(parents)>=pop_size:
                     break
