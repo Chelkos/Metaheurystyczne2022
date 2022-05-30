@@ -145,11 +145,16 @@ def test_all(G):
 
 if __name__=='__main__':
     random.seed(170)
-    G = gen.generate_symmetric(10,1000)
+    G = gen.generate_symmetric(30,1000)
     #sol = alg.repetitive_nearest_neighbour(G)
     #print(utils.objective(sol))
     #test_alg_type()
     #test_start()
     #test_tabu_graph()
     #test_tabu_size()
-    gene.generate_population(G,alg=alg.k_random)
+    print(utils.objective(alg.repetitive_nearest_neighbour(G)))
+    #sol = alg.tabu_search(G, 100, 15, alg.invert, alg.nearest_neighbour)
+    #print(utils.objective(sol))
+ 
+    sol = gene.genetic(G,100)
+    print(utils.objective(sol))

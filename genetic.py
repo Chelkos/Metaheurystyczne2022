@@ -1,21 +1,37 @@
 import algorithms as algs
 import networkx as nx
 import random
-import utils as utils
+import utils
 
-def generate_population(G, alg=algs.k_random, pop_size =10):
+def genetic(G, pop_size, reps=1000):
+    population = generate_population(G, algs.k_random, pop_size)
+    best_weight = float('inf')
+    best_sol = None
+    i = 0
+
+    while i < reps:
+        print(i)
+        for member in population:
+            if member[1] < best_weight:
+                best_weight = member[1]
+                best_sol = member[0]
+                i = 0
+        parents = selection(G, population,pop_size)
+        population = breed(G, parents)
+        i+=1
+
+    return best_sol
+
+
+def generate_population(G, alg=algs.k_random, pop_size=10):
     population = []
 
     for n in range(pop_size):
         sol = alg(G)
         weight = utils.objective(sol)
         population.append((sol,weight))
-        print(sol.nodes()," ",weight)
-    selection(G, population,pop_size)
-    
 
-#def generate_tuples(population):
-
+    return population
 
 
 def selection(G, population, pop_size, elite_size=2):
@@ -32,21 +48,15 @@ def selection(G, population, pop_size, elite_size=2):
     for i in range(len(population)):
         prob.append((1/population[i][1])/sum)
 
-    while len(parents)<pop_size/2:
+    while len(parents)<pop_size:
         for i in range(len(population)):
             if random.randrange(0,1)<prob[i] and population[i] not in parents:
                 parents.append(population[i])
-                print(population[i][0].nodes())
-                if len(parents)>=pop_size/2:
+                if len(parents)>=pop_size:
                     break
-    breed(G, parents)
     return parents
 
-
 def single_breed(G,parent1,parent2,start,end):
-
-
-    print(start, end)
     child = nx.DiGraph()
     
     for j in range(start, end):
@@ -73,7 +83,6 @@ def breed(G, parents):
     for i in range(0, len(parents)-1, 2):
         parent1 = parents[i][0].nodes()
         parent2 = parents[i+1][0].nodes()
-        
         geneA = random.randint(0, len(parent1)-1)
         geneB = random.randint(0, len(parent2)-1)
 
@@ -81,7 +90,5 @@ def breed(G, parents):
         end = max(geneA, geneB)
         new_pop.append(single_breed(G,parent1,parent2,start,end))
         new_pop.append(single_breed(G,parent2,parent1,start,end))
-        new_pop.append(parents[i])
-        new_pop.append(parents[i+1])
-        print(i)
-    #print(new_pop)
+
+    return new_pop
