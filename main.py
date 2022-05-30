@@ -160,5 +160,5 @@ if __name__=='__main__':
     sol = alg.tabu_search(G, 100, 15, alg.invert, alg.nearest_neighbour)
     print(utils.objective(sol))
  
-    sol = gene.genetic(G,100)
+    sol = gene.genetic(G,120)
     print(utils.objective(sol))
