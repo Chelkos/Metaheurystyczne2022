@@ -16,6 +16,12 @@ def generate_population(G, alg=algs.k_random, pop_size =10):
 
 #def generate_tuples(population):
 
+def mutate(G,route,operation = algs.invert):
+    geneA = random.randint(0, len(G.nodes())-1)
+    geneB = random.randint(0, len(G.nodes())-1)
+    start = min(geneA, geneB)
+    end = max(geneA, geneB)
+    return operation(G,route,start,end)
 
 
 def selection(G, population, pop_size, elite_size=2):
@@ -65,6 +71,9 @@ def single_breed(G,parent1,parent2,start,end):
         child.add_edge(nodes[n], nodes[n+1], weight=G[nodes[n]][nodes[n+1]]['weight'])
     
     child.add_edge(nodes[0], nodes[len(G.nodes())-1], weight=G[nodes[0]][nodes[len(G.nodes())-1]]['weight'])
+    prob = random.randint(0,100) #mutacja i prawdopodobieństwo zajścia mutacji
+    if prob<=1: 
+        child = mutate(G,child)
     return (child,utils.objective(child))
 
 
