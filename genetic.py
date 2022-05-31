@@ -2,23 +2,23 @@ import algorithms as algs
 import networkx as nx
 import random
 import utils
-
-def genetic(G, pop_size, reps=250):
+import math
+def genetic(G, pop_size=100, reps=400,elite_size = -1,chance = 40 ):
+    if elite_size<0:
+        elite_size =math.ceil(pop_size/10)
     population = generate_population(G, algs.nearest_neighbour, pop_size)
     best_weight = float('inf')
     best_sol = None
     i = 0
-    curr_small = float('inf')
     while i < reps:
         for member in population:
             if member[1] < best_weight:
                 best_weight = member[1]
                 best_sol = member[0]
-                print(best_weight)
                 i = 0
-            
-        parents,elite = selection(G, population,pop_size)
-        population = breed(G, parents)
+                print(member[1])
+        parents,elite = selection(G, population,pop_size,elite_size)
+        population = breed(G, parents,chance)
         population+=elite
         population = sorted(population,key = lambda x:x[1])
         population = population[:pop_size]
@@ -37,7 +37,7 @@ def generate_population(G, alg=algs.k_random, pop_size=10):
 
     return population
 
-def mutate(G,route,operation = algs.swap):
+def mutate(G,route,operation = algs.invert):
     geneA = random.randint(0, len(G.nodes())-1)
     geneB = random.randint(0, len(G.nodes())-1)
     start = min(geneA, geneB)
@@ -45,13 +45,13 @@ def mutate(G,route,operation = algs.swap):
     return operation(G,route,start,end)
 
 
-def selection(G, population, pop_size): #tournament
+def selection(G, population, pop_size, elite_size=2): #tournament
     parents = []
-
+    sortu = sorted(population,key = lambda x:x[1])
     while len(parents)<pop_size:
         potential_parents = []
 
-        for i in range(20):
+        for i in range(30):
             p = random.choice(population)
             potential_parents.append(p)
 
@@ -61,15 +61,15 @@ def selection(G, population, pop_size): #tournament
                 best = element
 
         parents.append(best)
-
-    return parents
+    the_best_parents = sortu[0:elite_size]
+    return parents, the_best_parents
         
 def selection2(G, population, pop_size, elite_size=2): #roulette
     parents = []
     
     prob = []
     sortu = sorted(population,key = lambda x:x[1])
-    the_best_parents = []
+    
     maxi = population[0][1]
     sum = 0
 
@@ -89,7 +89,7 @@ def selection2(G, population, pop_size, elite_size=2): #roulette
                     break
     return parents,sortu[0:elite_size]
 
-def single_breed(G,parent1,parent2,start,end):
+def single_breed(G,parent1,parent2,start,end,chance = 40):
     child = nx.DiGraph()
     
     for j in range(start, end):
@@ -109,12 +109,12 @@ def single_breed(G,parent1,parent2,start,end):
     
     child.add_edge(nodes[0], nodes[len(G.nodes())-1], weight=G[nodes[0]][nodes[len(G.nodes())-1]]['weight'])
     prob = random.randint(0,100) #mutacja i prawdopodobieństwo zajścia mutacji
-    if prob<=1: 
+    if prob<=chance: 
         child = mutate(G,child)
     return (child,utils.objective(child))
 
 
-def breed(G, parents):
+def breed(G, parents,chance):
     new_pop = []
     for i in range(0, len(parents)-1, 2):
         parent1 = parents[i][0].nodes()
@@ -124,7 +124,7 @@ def breed(G, parents):
 
         start = min(geneA, geneB)
         end = max(geneA, geneB)
-        new_pop.append(single_breed(G,parent1,parent2,start,end))
-        new_pop.append(single_breed(G,parent2,parent1,start,end))
+        new_pop.append(single_breed(G,parent1,parent2,start,end,chance))
+        new_pop.append(single_breed(G,parent2,parent1,start,end,chance))
 
     return new_pop
