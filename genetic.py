@@ -3,7 +3,7 @@ import networkx as nx
 import random
 import utils
 import math
-def genetic(G, pop_size=100, reps=400,elite_size = -1,chance = 40 ):
+def genetic(G, pop_size=50, reps=1000,elite_size = -1,chance = 10 ):
     if elite_size<0:
         elite_size =math.ceil(pop_size/10)
     population = generate_population(G, algs.nearest_neighbour, pop_size)

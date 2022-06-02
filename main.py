@@ -138,7 +138,8 @@ def test_all(G):
         alg.nearest_neighbour, 
         alg.repetitive_nearest_neighbour,
         alg._2_opt,
-        alg.tabu_search
+        alg.tabu_search,
+        gene.genetic
     ]
 
     for algorithm in algorithms:
@@ -148,7 +149,7 @@ def test_all(G):
 
 
 
-def test_genetic(G):
+def test_genetic():
     sizes = [20,30,50]
     graphs = ['bayg29.tsp','bays29.tsp'] 
     pop_size = [10,50,100,200,300,400,500,1000]
@@ -158,7 +159,7 @@ def test_genetic(G):
     algs = [alg.nearest_neighbour,alg.repetitive_nearest_neighbour,alg._2_opt,alg.tabu_search]
     for size in sizes:
         G = gen.generate_symmetric(size,1000)
-        base_name = ""+size+"_"
+        base_name = ""+str(size)+"_"
         r_f_time = base_name+"_reps_time.txt"
         r_f_weight = base_name+"_reps_weight.txt"
         f_t = open(r_f_time,'a')
@@ -180,49 +181,35 @@ def test_genetic(G):
             sol = gene.genetic(G,reps = rep)
             passed = time.time()-now
             result = utils.objective(sol)
-            f_t.write(rep,passed)
-            f_w.write(rep,result)
+            write_to_file(f_t,rep,passed)
+            write_to_file(f_w,rep,result)
         for pop in pop_size:
             now = time.time()
             sol = gene.genetic(G,pop_size=pop)
             passed = time.time()-now
             result = utils.objective(sol)
-            p_t.write(pop,passed)
-            p_w.write(pop,result)
+            write_to_file(p_t,pop,passed)
+            write_to_file(p_w,pop,result)
         for elite in elite_size:
             now = time.time()
             sol = gene.genetic(G,elite_size=elite)
             passed = time.time()-now
             result = utils.objective(sol)
-            e_t.write(elite,passed)
-            e_w.write(elite,result)
+            write_to_file(e_t,elite,passed)
+            write_to_file(e_w,elite,result)
         for m in mutate_chance:
             now = time.time()
             sol = gene.genetic(G,chance=m)
             passed = time.time()-now
             result = utils.objective(sol)
-            m_t.write(elite,passed)
-            m_w.write(elite,result)
+            write_to_file(m_t,elite,passed)
+            write_to_file(m_w,elite,result)
 
 
         
     return
 
 if __name__=='__main__':
-    random.seed(170)
-    G = gen.generate_symmetric(30,1000)
-    G = load("bays29.tsp")
-    #sol = alg.repetitive_nearest_neighbour(G)
-    #print(utils.objective(sol))
-    #test_alg_type()
-    #test_start()
-    #test_tabu_graph()
-    #test_tabu_size()
-    print(utils.objective(alg.repetitive_nearest_neighbour(G)))
-    sol = alg.tabu_search(G, 100, 15, alg.invert, alg.nearest_neighbour)
-    print(len(sol.edges()))
-    print(utils.objective(sol))
- 
-    sol = gene.genetic(G,300)
-    print(utils.objective(sol))
-    print(len(sol.edges()))
+    random.seed(152)
+    test_tabu_graph()
+    #test_genetic()
